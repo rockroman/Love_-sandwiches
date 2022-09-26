@@ -13,7 +13,7 @@ SCOPE = [
 CREDS = Credentials.from_service_account_file('creds.json')
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
-SHEET = GSPREAD_CLIENT.open(' love_sandwiches')
+SHEET = GSPREAD_CLIENT.open('love_sandwiches')
 
 
 def get_sales_data():
@@ -34,12 +34,15 @@ def get_sales_data():
             print("Data is valid")
             break
 
+    return sales_data
+
 
 def validate_data(values):
     """
     Validate users input
     inside try converts all strings values to integers
-    raise ValueError if strings cannot be converted into int,or if there aren't exactly 6 values
+    raise ValueError if strings cannot be converted into int,
+    or if there aren't exactly 6 values
     """
     try:
         [int(value) for value in values]       
@@ -53,12 +56,21 @@ def validate_data(values):
     
     return True
 
-    
-    
+def update_sales_worksheet(data):
+    """
+    Update sales worksheet,add new row with data
+    provided by user
+    """
+    print("Updating sales worksheet...\n")
+    sales_worksheet = SHEET.worksheet("sales")
+    sales_worksheet.append_row(data)
+    print("sales worksheet updated successfully> \n")
 
-get_sales_data()
 
+data = get_sales_data()
+sales_data = [int(num) for num in data]
 
+update_sales_worksheet(data)
 
 
 
