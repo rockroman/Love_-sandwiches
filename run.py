@@ -3,6 +3,7 @@
 # Write your code to expect a terminal of 80 characters wide and 24 rows high
 import gspread
 from google.oauth2.service_account import Credentials
+
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -19,14 +20,19 @@ def get_sales_data():
     """
     Get sales figures input from the user
     """
-    print("Please enter the sales data from tehe last Market.")
-    print("Data should be six numbers ,separated by commas.")
-    print("Example: 10,11,12,14,23,54\n")
+    while True:
+        print("Please enter the sales data from tehe last Market.")
+        print("Data should be six numbers ,separated by commas.")
+        print("Example: 10,11,12,14,23,54\n")
 
-    data_str = input('Enter your data here: ') 
+        data_str = input('Enter your data here: ') 
 
-    sales_data = data_str.split(",")
-    validate_data((sales_data))
+        sales_data = data_str.split(",")
+       
+
+        if validate_data(sales_data):
+            print("Data is valid")
+            break
 
 
 def validate_data(values):
@@ -43,8 +49,11 @@ def validate_data(values):
             )
     except ValueError as e:
         print(f"invalid data : {e}, please provide valid data\n")
+        return False
+    
+    return True
 
-
+    
     
 
 get_sales_data()
