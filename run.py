@@ -26,11 +26,9 @@ def get_sales_data():
         print("Data should be six numbers ,separated by commas.")
         print("Example: 10,11,12,14,23,54\n")
 
-        data_str = input('Enter your data here: ') 
+        data_str = input('Enter your data here: ')
 
-        sales_data = data_str.split(",")
-       
-
+        sales_data = data_str.split(",")   
         if validate_data(sales_data):
             print("Data is valid")
             break
@@ -54,7 +52,7 @@ def validate_data(values):
     except ValueError as e:
         print(f"invalid data : {e}, please provide valid data\n")
         return False
-    
+
     return True
 
 
@@ -69,7 +67,6 @@ def calculate_surplus_data(sales_row):
     stock = SHEET.worksheet("stock").get_all_values()
     stock_row = stock.pop()
     stock_row = [int(value) for value in (stock_row)]
-    
     surplus_data = []
     for stock, sales in zip(stock_row, sales_row):
         surplus = stock - sales
@@ -81,12 +78,46 @@ def calculate_surplus_data(sales_row):
 def update_worksheet(data, worksheet):
     """
     update sheet of data
-    passed into this function 
+    passed into this function
     """
     print(f"Updating {worksheet} worksheet...\n")
     worksheet_to_updaste = SHEET.worksheet(worksheet)
     worksheet_to_updaste.append_row(data)
     print(f"{worksheet} worksheet updated successfully..\n")
+
+
+def get_last_five_entry_sales():
+    """
+    collect collumns of data from sales worksheet 
+    ,collecting the last 5 entries for each sandwich
+    and returns the data as a list of lists
+    """
+    sales = SHEET.worksheet("sales")
+
+    columns = []
+
+    for ind in range(1, 7):
+        column = sales.col_values(ind)
+        columns.append(column[-5:])
+
+    return columns
+
+
+def calculate_stock_data(data):
+    """
+    calculate average stock for each type and
+    add 10%
+    """
+    print("calculating stock data...\n")
+    new_stock_data = []
+
+    for column in data:
+        int_column = [int(num) for num in column]
+        average = sum(int_column) / len(int_column)
+        stock_num = average * 1.1
+        new_stock_data.append(round(stock_num))
+
+    return new_stock_data
 
 
 def main():
@@ -98,32 +129,10 @@ def main():
     update_worksheet(data, "sales")
     new_surplus_data = calculate_surplus_data(sales_data)
     update_worksheet(new_surplus_data, "surplus")
-
-
-def get_last_five_entry_sales():
-    """
-    collect collumns of data from sales worksheet 
-    ,collecting the last 5 entries for each sandwich
-    and returns the data as a list of lists
-    """
-    sales = SHEET.worksheet("sales")
-   
-    columns = []
-
-    for ind in range(1, 7):
-        column = sales.col_values(ind)
-        columns.append(column[-5:])
-
-    return(columns)
-   
-
-    # for col in columns:
-    #     last_5=(col[-5:])
-             
+    sales_column = get_last_five_entry_sales()
+    stock_data = calculate_stock_data(sales_column)
+    update_worksheet(stock_data, "stock")
 
 
 print("Welcome to love Sandwiches Data Automation..\n")
-
-# main()
-
-sales_columns=get_last_five_entry_sales()
+main()
